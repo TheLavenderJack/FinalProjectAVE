@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class MovePendulum : MonoBehaviour
 {
-    [SerializeField] public float frequency = 1f;
+    public float frequency;
     [Range(0f,1f)]
     [SerializeField] public float amplitude = 0.25f;
+    [SerializeField] ConductorScript conductor;
     float t;
     float prev_oscillation;
     float delta;
@@ -16,6 +17,7 @@ public class MovePendulum : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        frequency = conductor.tempoMs/1000;
         t += Time.deltaTime;
         //triangle function 
         float oscillation = ControlFunctions.Tri(t, frequency, 0.5f) * amplitude;

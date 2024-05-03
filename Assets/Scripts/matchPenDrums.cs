@@ -10,33 +10,39 @@ public class matchPenDrums : MonoBehaviour
     public float ramp = 500;
     float t;
     int[] mode;
-    int count = 0;
+    public int count = 0;
 
     [SerializeField]
     public float rateOfInstrument = 1;
     
 
     [SerializeField]
-    List<bool> kick;
+    public List<bool> kick;
     [SerializeField]
     List<bool> snare;
     [SerializeField]
     List<bool> sticks;
     public List<AudioClip> sounds;
     string[] drum_type = new string[] { "Kick", "Snare", "Sticks" };
-    List<float> envelopes = new List<float>();
-    List<bool>[] gates = new List<bool>[3];
+    public List<float> envelopes = new List<float>();
+    public List<bool>[] gates = new List<bool>[3];
     List<Vector4> adsr_params = new List<Vector4>();
     GameObject kickObj; 
     GameObject snareObj;
     GameObject stickObj;
-
+    
+    bool delay;
+    int delayTime;
+    float delayRamp = 0;
 
     [SerializeField]
     MovePendulum getROS;
 
     void Start()
     {
+        //start up delay for the drums
+        delay = true;
+        delayTime = 250;
         ramp = ramp*getROS.frequency;
         for(int i = 0; i < sounds.Count; i++)
         {
@@ -52,6 +58,7 @@ public class matchPenDrums : MonoBehaviour
         gates[0] = kick;
         gates[1] = snare;
         gates[2] = sticks;
+        adsr_params.Add(new Vector4(100, 100, 0, 0));
     }
 
     // Update is called once per frame
@@ -59,6 +66,17 @@ public class matchPenDrums : MonoBehaviour
     {
         t += Time.deltaTime;
         int dMs = Mathf.RoundToInt(Time.deltaTime * 1000);
+
+        //delay setup
+        if(delay){
+            ramp = 0;
+            //setting up delay for the first note to come in 
+            bool delayTrig = delayRamp > (delayRamp + dMs) % delayTime;
+            delayRamp = (delayRamp + dMs) % delayTime;
+            if(delayTrig){
+                delay = false;
+            }
+        }
 
         bool trig = ramp > ((ramp + dMs) % (1000/(getROS.frequency*rateOfInstrument)));
         ramp = (ramp + dMs) % (1000/(getROS.frequency*rateOfInstrument));
@@ -80,16 +98,16 @@ public class matchPenDrums : MonoBehaviour
             count = (count + 1) % kick.Count;
         }
         
-        /*
+        
         for (int i = 0; i < sounds.Count; i++){
             if(count==0){
-                envelopes[i] = ControlFunctions.ADSR(ramp/1000, gates[i][kick.Count-1], adsr_params[i]);
+                envelopes[i] = ControlFunctions.ADSR(ramp/1000, gates[i][kick.Count-1], adsr_params[0]);
             }
             else{
-                envelopes[i] = ControlFunctions.ADSR(ramp/1000, gates[i][count-1], adsr_params[i]);
+                envelopes[i] = ControlFunctions.ADSR(ramp/1000, gates[i][count-1], adsr_params[0]);
             }
-           
+            
         }
-        */
+
     }
 }
