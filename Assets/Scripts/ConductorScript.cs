@@ -11,9 +11,9 @@ public class ConductorScript : MonoBehaviour
     [SerializeField] float ramp = 250;
     float t;
 
-    public int delayUntilMain;
-
     [SerializeField] Sequencer a;
+    [SerializeField] Sequencer a1;
+    
     [SerializeField] Sequencer b;
     [SerializeField] List<Sequencer> startchords = new List<Sequencer>();
     [SerializeField] matchPenDrums drums = new matchPenDrums();
@@ -21,10 +21,13 @@ public class ConductorScript : MonoBehaviour
     
     void Start()
     {
-        //time before main start
-        delayUntilMain = 15750;
-
-        
+        for(int i=0;i<a.seq.Count;i++){
+            a.seq[i]=false;
+            a1.seq[i]=false;
+        }
+        for(int i=0;i<b.seq.Count;i++){
+            b.seq[i]=false;
+        }
     }
 
     // Update is called once per frame
@@ -48,6 +51,7 @@ public class ConductorScript : MonoBehaviour
             foreach(Sequencer s in startchords){
                 for(int i=0;i<4;i++){
                     s.seq[i] = false;
+                    s.startingChords = false;
                 }
             }
             eventTrig = false;
@@ -78,8 +82,13 @@ public class ConductorScript : MonoBehaviour
             eventTrig = false;
         }
 
+
+
+        //end of intro/start of main sequence
         if(globalCount == 14 && eventTrig){
             drums.rateOfInstrument = 4;
+            drums.count = 0;
+            drums.ramp = (1000/(drums.getROS.frequency*drums.rateOfInstrument))-1;
             for(int i=0;i<16;i++){
                 drums.gates[0][i] = false;
                 drums.gates[1][i] = false;
@@ -100,30 +109,172 @@ public class ConductorScript : MonoBehaviour
             drums.gates[1][14] = true;
             drums.gates[0][15] = true;
 
+            a.sequenceCount = 0;
+            a.ramp = a.tempoMs-5;
+            a1.sequenceCount = 0;
+            a1.ramp = a1.tempoMs-5;
+            for(int i=0;i<a.seq.Count;i++){
+                a.seq[i] = true;
+                a1.notes[i]-=5;
+                a1.seq[i] = true;
+            }
+
+            b.emitSphere.GetComponent<Renderer>().material.SetFloat("_emitTrans", 1);
+
+            b.sequenceCount = 0;
+            b.ramp = b.tempoMs-5;
+            for(int i=0;i<b.seq.Count;i++){
+                b.notes[i] = b.CNote+b.fastHighNoteSeq1[i];
+                if(b.notes[i]==-12){
+                    b.seq[i] = false;
+                }
+                else{
+                    b.seq[i] = true;
+                }
+            }
+
             eventTrig = false;
         }
 
-
-        //note changes for main melody
         if(globalCount == 16 && eventTrig){
-            for(int i=0;i<a.seq.Count;i++){
-                a.notes[i]+=4;
+            for(int i=0;i<a1.seq.Count;i++){
+                a1.notes[i]+=1;
+            }
+            eventTrig = false;
+        }
+
+        if(globalCount == 18 && eventTrig){
+            for(int i=0;i<a1.seq.Count;i++){
+                a1.notes[i]+=1;
             }
             eventTrig = false;
         }
 
         if(globalCount == 20 && eventTrig){
+            for(int i=0;i<a1.seq.Count;i++){
+                a1.notes[i]+=1;
+            }
+            eventTrig = false;
+        }
+
+        if(globalCount == 22 && eventTrig){
+            for(int i=0;i<a.seq.Count;i++){
+                a.notes[i]+=3;
+                a1.notes[i]-=2;
+            }
+
+            for(int i=0;i<b.seq.Count;i++){
+                b.notes[i] = b.CNote+b.fastHighNoteSeq2[i];
+                if(b.notes[i]==-12){
+                    b.seq[i] = false;
+                }
+                else{
+                    b.seq[i] = true;
+                }
+            }
+            eventTrig = false;
+        }
+        
+        if(globalCount == 26 && eventTrig){
+            for(int i=0;i<a.seq.Count;i++){
+                a.notes[i]-=4;
+                a1.notes[i]-=1;
+            }
+            eventTrig = false;
+        }
+
+        //Both on C
+        if(globalCount == 30 && eventTrig){
             for(int i=0;i<a.seq.Count;i++){
                 a.notes[i]+=1;
+                a1.notes[i]+=5;
             }
+
+            for(int i=0;i<b.seq.Count;i++){
+                b.notes[i] = b.CNote+b.fastHighNoteSeq1[i];
+                if(b.notes[i]==-12){
+                    b.seq[i] = false;
+                }
+                else{
+                    b.seq[i] = true;
+                }
+            }
+
             eventTrig = false;
         }
-        if(globalCount == 24 && eventTrig){
+
+        if(globalCount == 33 && eventTrig){
             for(int i=0;i<a.seq.Count;i++){
-                a.notes[i]-=5;
+                a1.notes[i]-=2;
             }
             eventTrig = false;
         }
+
+        if(globalCount == 34 && eventTrig){
+            for(int i=0;i<a.seq.Count;i++){
+                a1.notes[i]-=1;
+            }
+            eventTrig = false;
+        }
+
+        if(globalCount == 36 && eventTrig){
+            for(int i=0;i<a.seq.Count;i++){
+                a1.notes[i]-=1;
+            }
+            eventTrig = false;
+        }
+        
+        if(globalCount == 38 && eventTrig){
+            for(int i=0;i<a.seq.Count;i++){
+                a.notes[i]-=1;
+                a1.notes[i]-=1;
+            }
+            eventTrig = false;
+        }
+
+        if(globalCount == 42 && eventTrig){
+            for(int i=0;i<a.seq.Count;i++){
+                a.seq[i] = false;
+                a1.seq[i] = false;
+            }
+
+            for(int i=0;i<b.seq.Count;i++){
+                if(i==0||i==1||i==15){
+                    b.seq[i] = true;
+                }
+                else{
+                    b.seq[i] = false;
+                }
+            }
+            
+            b.notes[0] = b.CNote;
+            b.notes[1] = b.CNote;
+            b.notes[15] = b.CNote-2;
+            
+            eventTrig = false;
+        }
+
+        if(globalCount == 47 && eventTrig){
+            for(int i=0;i<b.seq.Count;i++){
+                b.seq[i] = false;
+            }
+            drums.gates[0][0] = false;
+            drums.gates[0][15] = false;
+            eventTrig = false;
+        }
+
+        if(globalCount == 50 && eventTrig){
+            for(int i=0;i<b.seq.Count;i++){
+                b.seq[i] = false;
+            }
+            for(int i=0;i<16;i++){
+                drums.gates[0][i] = false;
+                drums.gates[1][i] = false;
+            }
+            eventTrig = false;
+        }
+
+
 
 
     }

@@ -36,13 +36,13 @@ public class matchPenDrums : MonoBehaviour
     float delayRamp = 0;
 
     [SerializeField]
-    MovePendulum getROS;
+    public MovePendulum getROS;
 
     void Start()
     {
         //start up delay for the drums
-        delay = true;
-        delayTime = 250;
+        // delay = true;
+        // delayTime = 250;
         ramp = ramp*getROS.frequency;
         for(int i = 0; i < sounds.Count; i++)
         {
@@ -68,15 +68,15 @@ public class matchPenDrums : MonoBehaviour
         int dMs = Mathf.RoundToInt(Time.deltaTime * 1000);
 
         //delay setup
-        if(delay){
-            ramp = 0;
-            //setting up delay for the first note to come in 
-            bool delayTrig = delayRamp > (delayRamp + dMs) % delayTime;
-            delayRamp = (delayRamp + dMs) % delayTime;
-            if(delayTrig){
-                delay = false;
-            }
-        }
+        // if(delay){
+        //     ramp = 0;
+        //     //setting up delay for the first note to come in 
+        //     bool delayTrig = delayRamp > (delayRamp + dMs) % delayTime;
+        //     delayRamp = (delayRamp + dMs) % delayTime;
+        //     if(delayTrig){
+        //         delay = false;
+        //     }
+        // }
 
         bool trig = ramp > ((ramp + dMs) % (1000/(getROS.frequency*rateOfInstrument)));
         ramp = (ramp + dMs) % (1000/(getROS.frequency*rateOfInstrument));
